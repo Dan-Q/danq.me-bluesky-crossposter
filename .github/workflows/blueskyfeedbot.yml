@@ -1,0 +1,38 @@
+name: FeedBot
+on:
+  schedule:
+    # Every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Or on-demand
+concurrency:
+  group: feedbot
+jobs:
+  rss-to-bluesky:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate cache key
+        uses: actions/github-script@v6
+        id: generate-key
+        with:
+          script: |
+            core.setOutput('cache-key', new Date().valueOf())
+      - name: Retrieve cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/blueskyfeedbot
+          key: feed-cache-${{ steps.generate-key.outputs.cache-key }}
+          restore-keys: feed-cache-
+      - name: GitHub
+        uses: 'joschi/blueskyfeedbot@v1'
+        with:
+          rss-feed: https://danq.me/feed-minus-rss-club/
+          template: |
+            🆕 {{item.title}}
+            
+            {{item.description}}
+            
+            🔗 {{item.link}}
+          username: ${{ secrets.BLUESKY_USERNAME }}
+          password: ${{ secrets.BLUESKY_PASSWORD }}
+          cache-file: ${{ github.workspace }}/blueskyfeedbot/cache.json
+          initial-post-limit: 30
