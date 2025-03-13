@@ -28,10 +28,9 @@ jobs:
           rss-feed: https://danq.me/feed-minus-rss-club/
           template: |
             🆕 {{item.title}}
+            🔗 {{item.link}}
             
             {{item.description}}
-            
-            🔗 {{item.link}}
           username: ${{ secrets.BLUESKY_USERNAME }}
           password: ${{ secrets.BLUESKY_PASSWORD }}
           cache-file: ${{ github.workspace }}/blueskyfeedbot/cache.json
